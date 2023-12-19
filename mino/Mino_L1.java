@@ -4,10 +4,11 @@ import java.awt.Color;
 
 public class Mino_L1 extends Mino {
 
+	public static final Color LIGHT_PURPLE = new Color(195,146,255);
+
 	public Mino_L1() {
-		create (Color.orange);
-	}
-	public void setXY(int x, int y) {
+		create(LIGHT_PURPLE);
+	}	public void setXY(int x, int y) {
 		// o
 		// o
 		// o o	

@@ -4,10 +4,11 @@ import java.awt.Color;
 
 public class Mino_L2 extends Mino {
 
+	public static final Color TECNA_DARK_GREEN = new Color(80,160,80);
+
 	public Mino_L2() {
-		create (Color.blue);
-	}
-	public void setXY(int x, int y) {
+		create(TECNA_DARK_GREEN);
+	}	public void setXY(int x, int y) {
 		//   o
 		//   o
 		// o o

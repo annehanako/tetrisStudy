@@ -1,23 +1,10 @@
 package tetrisGameClone;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
-import java.awt.RenderingHints.Key;
+import mino.*;
+
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Random;
-
-import mino.Block;
-import mino.Mino;
-import mino.Mino_Bar;
-import mino.Mino_L1;
-import mino.Mino_L2;
-import mino.Mino_Square;
-import mino.Mino_T;
-import mino.Mino_Z1;
-import mino.Mino_Z2;
 
 public class PlayManager {
 
@@ -46,7 +33,7 @@ public class PlayManager {
 
 	boolean effectCounterOn;
 	int effectCounter;
-	ArrayList<Integer> effectY = new ArrayList <>();
+	ArrayList<Integer> effectY = new ArrayList<>();
 
 	// Score
 
@@ -78,35 +65,22 @@ public class PlayManager {
 		Mino mino = null;
 		int i = new Random().nextInt(7);
 
-		switch (i) {
-			case 0:
-				mino = new Mino_L1();
-				break;
-			case 1:
-				mino = new Mino_L2();
-				break;
-			case 2:
-				mino = new Mino_Square();
-				break;
-			case 3:
-				mino = new Mino_Bar();
-				break;
-			case 4:
-				mino = new Mino_T();
-				break;
-			case 5:
-				mino = new Mino_Z1();
-				break;
-			case 6:
-				mino = new Mino_Z2();
-				break;
-		}
+		mino = switch (i) {
+			case 0 -> new Mino_L1();
+			case 1 -> new Mino_L2();
+			case 2 -> new Mino_Square();
+			case 3 -> new Mino_Bar();
+			case 4 -> new Mino_T();
+			case 5 -> new Mino_Z1();
+			case 6 -> new Mino_Z2();
+			default -> mino;
+		};
 		return mino;
 	}
 
 	public void update() {
 
-		if (currentMino.active == false) {
+		if (!currentMino.active) {
 			staticBlocks.add(currentMino.b[0]);
 			staticBlocks.add(currentMino.b[1]);
 			staticBlocks.add(currentMino.b[2]);
@@ -115,10 +89,13 @@ public class PlayManager {
 
 			// gameover check
 
-			if (currentMino.b[0].x == MINO_START_X && currentMino.b[0].y == MINO_START_Y){
+			if (currentMino.b[0].x == MINO_START_X && currentMino.b[0].y == MINO_START_Y) {
 				// This means the currentMino collided a block and can't move, so the xy are the same with the nextMino
 				gameOver = true;
-			} 
+				GamePanel.music.stop();
+				GamePanel.se.play(2,false);
+
+			}
 
 			currentMino.deactivating = false;
 
@@ -133,31 +110,32 @@ public class PlayManager {
 
 		}
 	}
-	private void checkDelete(){
-		
+
+	private void checkDelete() {
+
 		int x = left_x;
 		int y = top_y;
 		int blockCount = 0;
 		int lineCount = 0;
 
-		while (x < right_x && y < bottom_y){
+		while (x < right_x && y < bottom_y) {
 
-			for (int i = 0; i < staticBlocks.size(); i++){
-				if (staticBlocks.get(i).x == x && staticBlocks.get (i).y == y){
+			for (Block staticBlock : staticBlocks) {
+				if (staticBlock.x == x && staticBlock.y == y) {
 					blockCount++;
 				}
 			}
 
 			x += Block.SIZE;
-			if (x == right_x){
+			if (x == right_x) {
 
-				if (blockCount == 12){
+				if (blockCount == 12) {
 
 					effectCounterOn = true;
 					effectY.add(y);
-					
-					for (int i = staticBlocks.size()-1; i > -1; i--){
-						if (staticBlocks.get(i).y==y){
+
+					for (int i = staticBlocks.size() - 1; i > -1; i--) {
+						if (staticBlocks.get(i).y == y) {
 							staticBlocks.remove(i);
 						}
 					}
@@ -167,25 +145,24 @@ public class PlayManager {
 					// Drop Speed
 					// if the line score hits a certain number, it increases the drop speed
 					// 1 is the fastest
-					if (lines % 10 == 0 && dropInterval > 1){
+					if (lines % 10 == 0 && dropInterval > 1) {
 
 						level++;
-						if (dropInterval > 10){
+						if (dropInterval > 10) {
 							dropInterval -= 10;
-						}
-						else {
+						} else {
 							dropInterval -= 1;
 						}
 					}
 
 
-
-					for (int i = 0; i < staticBlocks.size();i++){
-						if (staticBlocks.get(i).y < y){
-							staticBlocks.get(i).y += Block.SIZE;
+					for (Block staticBlock : staticBlocks) {
+						if (staticBlock.y < y) {
+							staticBlock.y += Block.SIZE;
 						}
 					}
-					if (lineCount > 0){
+					if (lineCount > 0) {
+						GamePanel.se.play(1,false);
 						int singleLineScore = 10 * level;
 						score += singleLineScore * lineCount;
 					}
@@ -212,12 +189,14 @@ public class PlayManager {
 		g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 		g2.drawString("NEXT", x + 60, y + 60);
 
-		// Score frame 
+		// Score frame
 		g2.drawRect(x, top_y, 250, 300);
 		x += 40;
 		y = top_y + 90;
-		g2.drawString("LEVEL: " + level, x, y); y += 70;
-		g2.drawString("LINES: " + lines, x, y); y +=70;
+		g2.drawString("LEVEL: " + level, x, y);
+		y += 70;
+		g2.drawString("LINES: " + lines, x, y);
+		y += 70;
 		g2.drawString("SCORE: " + score, x, y);
 
 		// CurrentMino
@@ -226,8 +205,8 @@ public class PlayManager {
 		}
 		nextMino.draw(g2);
 
-		for (int i = 0; i < staticBlocks.size(); i++) {
-			staticBlocks.get(i).draw(g2);
+		for (Block staticBlock : staticBlocks) {
+			staticBlock.draw(g2);
 		}
 
 		// Effect Draw
@@ -235,8 +214,8 @@ public class PlayManager {
 		if (effectCounterOn) {
 			effectCounter++;
 			g2.setColor(Color.red);
-			for (int i = 0; i < effectY.size(); i++){
-				g2.fillRect(left_x, effectY.get(i), WIDTH, Block.SIZE);
+			for (Integer integer : effectY) {
+				g2.fillRect(left_x, integer, WIDTH, Block.SIZE);
 			}
 
 			if (effectCounter == 10) {
@@ -246,24 +225,16 @@ public class PlayManager {
 			}
 		}
 		// Pause and Game Over
-		g2.setColor(Color.yellow);
+		g2.setColor(Color.white);
 		g2.setFont(g2.getFont().deriveFont(50f));
-		if (gameOver){
+		if (gameOver) {
 			x = left_x + 25;
 			y = top_y + 320;
 			g2.drawString("GAME OVER", x, y);
-		}
-		else if (KeyHandler.pausePressed) {
+		} else if (KeyHandler.pausePressed) {
 			x = left_x + 70;
 			y = top_y + 320;
 			g2.drawString(("PAUSED"), x, y);
 		}
 
-	// game title	
-		x = 35;
-		y = top_y + 320;
-		g2.setColor(Color.white);
-		g2.setFont(new Font ("Times New Roman", Font.ITALIC, 60));
-		g2.drawString("TETRIS", x, y);
-	}
-}
+	}}

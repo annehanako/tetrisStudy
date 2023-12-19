@@ -3,10 +3,12 @@ package mino;
 import java.awt.Color;
 
 public class Mino_Square extends Mino {
+	public static final Color DARK_PURPLE = new Color(169,112,227);
 
 	public Mino_Square() {
-		create (Color.yellow);
+		create(DARK_PURPLE);
 	}
+
 	public void setXY(int x, int y) {
 		// o o 
 		// o o
@@ -20,8 +22,5 @@ public class Mino_Square extends Mino {
 		b[3].y = b[0].y + Block.SIZE;
 
 }
-	public void getDirection1() {}
-	public void getDirection2() {}
-	public void getDirection3() {}
-	public void getDirection4() {}
+
 }

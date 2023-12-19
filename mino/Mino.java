@@ -3,13 +3,14 @@ package mino;
 import java.awt.Color;
 import java.awt.Graphics2D;
 
+import tetrisGameClone.GamePanel;
 import tetrisGameClone.KeyHandler;
 import tetrisGameClone.PlayManager;
 
 public class Mino {
 
-	public Block b[] = new Block[4];
-	public Block tempB[] = new Block[4];
+	public Block[] b = new Block[4];
+	public Block[] tempB = new Block[4];
 	int autoDropCounter = 0;
 	public int direction = 1; // There are 4 directions
 	boolean rightCollision, leftCollision, bottomCollision;
@@ -33,7 +34,7 @@ public class Mino {
 
 	public void updateXY(int direction) {
 		checkRotationCollision();
-		if (leftCollision == false && rightCollision == false && bottomCollision == false) {
+		if (!leftCollision && !rightCollision && !bottomCollision) {
 			this.direction = direction;
 			b[0].x = tempB[0].x;
 			b[0].y = tempB[0].y;
@@ -68,24 +69,27 @@ public class Mino {
 
 		// left wall
 
-		for (int i = 0; i < b.length; i++) {
-			if (b[i].x == PlayManager.left_x) {
-				leftCollision = true;
-			}
-		}
+        for (Block block : b) {
+            if (block.x == PlayManager.left_x) {
+                leftCollision = true;
+                break;
+            }
+        }
 		// right wall
-		for (int i = 0; i < b.length; i++) {
-			if (b[i].x + Block.SIZE == PlayManager.right_x) {
-				rightCollision = true;
-			}
-		}
+        for (Block block : b) {
+            if (block.x + Block.SIZE == PlayManager.right_x) {
+                rightCollision = true;
+                break;
+            }
+        }
 
 		// bottom
-		for (int i = 0; i < b.length; i++) {
-			if (b[i].y + Block.SIZE == PlayManager.bottom_y) {
-				bottomCollision = true;
-			}
-		}
+        for (Block block : b) {
+            if (block.y + Block.SIZE == PlayManager.bottom_y) {
+                bottomCollision = true;
+                break;
+            }
+        }
 	}
 
 	public void checkRotationCollision() {
@@ -98,22 +102,25 @@ public class Mino {
 		// left wall
 
 		for (int i = 0; i < b.length; i++) {
-			if (tempB[i].x < PlayManager.left_x) {
-				leftCollision = true;
-			}
+            if (tempB[i].x < PlayManager.left_x) {
+                leftCollision = true;
+                break;
+            }
 		}
 		// right wall
 		for (int i = 0; i < b.length; i++) {
-			if (tempB[i].x + Block.SIZE > PlayManager.right_x) {
-				rightCollision = true;
-			}
+            if (tempB[i].x + Block.SIZE > PlayManager.right_x) {
+                rightCollision = true;
+                break;
+            }
 		}
 
 		// bottom
 		for (int i = 0; i < b.length; i++) {
-			if (tempB[i].y + Block.SIZE > PlayManager.bottom_y) {
-				bottomCollision = true;
-			}
+            if (tempB[i].y + Block.SIZE > PlayManager.bottom_y) {
+                bottomCollision = true;
+                break;
+            }
 		}
 	}
 
@@ -124,22 +131,25 @@ public class Mino {
 			int targetX = PlayManager.staticBlocks.get(i).x;
 			int targetY = PlayManager.staticBlocks.get(i).y;
 
-			for (int ii = 0; ii < b.length; ii++) {
-				if (b[ii].y + Block.SIZE == targetY && b[ii].x == targetX) {
-					bottomCollision = true;
-				}
+            for (Block block : b) {
+                if (block.y + Block.SIZE == targetY && block.x == targetX) {
+                    bottomCollision = true;
+                    break;
+                }
 
-			}
-			for (int ii = 0; ii < b.length; ii++) {
-				if (b[ii].x - Block.SIZE == targetX && b[ii].y == targetY) {
-					leftCollision = true;
-				}
-			}
-			for (int ii = 0; ii < b.length; ii++) {
-				if (b[ii].x + Block.SIZE == targetX && b[ii].y == targetY) {
-					rightCollision = true;
-				}
-			}
+            }
+            for (Block block : b) {
+                if (block.x - Block.SIZE == targetX && block.y == targetY) {
+                    leftCollision = true;
+                    break;
+                }
+            }
+            for (Block block : b) {
+                if (block.x + Block.SIZE == targetX && block.y == targetY) {
+                    rightCollision = true;
+                    break;
+                }
+            }
 		}
 
 	}
@@ -166,12 +176,13 @@ public class Mino {
 					break;
 			}
 			KeyHandler.upPressed = false;
+			GamePanel.se.play(3,false);
 
 		}
 		checkMovementCollision();
 
 		if (KeyHandler.downPressed) {
-			if (bottomCollision == false) {
+			if (!bottomCollision) {
 				b[0].y += Block.SIZE;
 				b[1].y += Block.SIZE;
 				b[2].y += Block.SIZE;
@@ -183,7 +194,7 @@ public class Mino {
 
 		}
 		if (KeyHandler.leftPressed) {
-			if (leftCollision == false) {
+			if (!leftCollision) {
 				b[0].x -= Block.SIZE;
 				b[1].x -= Block.SIZE;
 				b[2].x -= Block.SIZE;
@@ -194,7 +205,7 @@ public class Mino {
 		}
 
 		if (KeyHandler.rightPressed) {
-			if (rightCollision == false) {
+			if (!rightCollision) {
 				b[0].x += Block.SIZE;
 				b[1].x += Block.SIZE;
 				b[2].x += Block.SIZE;
@@ -204,6 +215,10 @@ public class Mino {
 
 		}
 		if (bottomCollision) {
+			if (!deactivating){
+				GamePanel.se.play(4,false);
+
+			}
 			deactivating = true;
 		} else {
 			autoDropCounter++;
@@ -213,7 +228,6 @@ public class Mino {
 				b[2].y += Block.SIZE;
 				b[3].y += Block.SIZE;
 				autoDropCounter = 0;
-
 			}
 		}
 	}
